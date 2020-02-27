@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Media Player</title>
+	<style>
+	    * {
+		box-sizing: border-box;
+	      }
+
+	      video, img {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+	      }
+
+	      .zeroOpacity{
+		opacity: 0;
+		visibility: hidden;
+	      }
+
+	      body{
+		background-color: black
+	      }
+	  </style>
+        <meta charset="UTF-8" />
+        <script src="node_modules/jquery/dist/jquery.js"></script>
+        <script src="node_modules/osc/dist/osc-browser.min.js"></script>
+        <script src="js/videoplayer.js"></script>
+        <script src="../../config.js"></script>
+        <script src="playlist.js"></script>
+        <script type="text/javascript">
+            var CurrentMedia = -1;
+
+            var port = new osc.WebSocketPort({
+                url: "ws://localhost:8081"
+            });
+
+            port.on("message", function (oscMessage)
+            {
+                //$("#message").text(JSON.stringify(oscMessage, undefined, 2));
+                //console.log("message", oscMessage);
+
+                if(oscMessage.address == "/play")
+                {
+                    VideoPlayer.Play("../../Medias/" + oscMessage.args[0], true);
+                    SendAcknowledge(oscMessage.args[0]);
+                }
+                else if (oscMessage.address == "/stop")
+                {
+                    VideoPlayer.Stop();
+                }
+            });
+
+            port.open();
+
+            var SendAcknowledge = function (fileId)
+            {
+                port.send({
+                    address: "/acknowledge",
+                    args: [ID, fileId]
+                });
+            }
+
+            var PlayNext = function ()
+            {
+                CurrentMedia++;
+
+                if(CurrentMedia >= PlayList.length)
+                    CurrentMedia = 0;
+
+                VideoPlayer.Play("../../Medias/" + PlayList[CurrentMedia]);
+            };
+
+            var UpdateLoop = function ()
+            {
+                if(!VideoPlayer.IsPlaying())
+                {
+                    PlayNext();
+                }
+            }
+
+            if(AUTOPLAY != false)
+            {
+                setInterval(UpdateLoop, 1100);//Mut be greater than fadetime
+            }
+            
+
+        </script>
+    </head>
+
+    <body>
+    </body>
+</html>
