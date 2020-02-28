@@ -92,7 +92,7 @@
             var SendAcknowledge = function (fileId)
             {
                 port.send({
-                    address: OSC_MESSAGE + "/",
+                    address: OSC_MESSAGE,
                     args: [ID, fileId]
                 });
             }
