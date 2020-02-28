@@ -1,7 +1,7 @@
 function Video() {
    this.$item = $(document.createElement('video'));
-   this.$item.css('opacity', 0);
-   this.$item.loop = false;
+   //this.$item.css('opacity', 0);
+   this.$item.loop = true;
    $('body').append(this.$item);
 
    this.Play = function(name, loop)
@@ -76,24 +76,12 @@ var VideoPlayer =
         if(this.items.length == 0)
         {
             this.items[0] = new Video();
-            this.items[1] = new Video();
         }
 
-        this.items[this.currentItem].Stop();
+        this.items[0].Stop();
 
-        this.Next();
+        this.items[0].Play(videoName, loop);
 
-        this.items[this.currentItem].Play(videoName, loop);
-
-    },
-
-    Next: function()
-    {
-      this.currentItem += 1;
-      if(this.currentItem >= this.items.length)
-      {
-        this.currentItem = 0;
-      }
     },
 
     Stop: function()
@@ -101,27 +89,26 @@ var VideoPlayer =
       if(this.items.length == 0)
       {
           this.items[0] = new Video();
-          this.items[1] = new Video();
       }
 
-      this.items[this.currentItem].Stop();
+      this.items[0].Stop();
     },
 
     Seek: function (seekTime)
     {
-        if (this.items.length == 0) {
+        if (this.items.length == 0)
+        {
             this.items[0] = new Video();
-            this.items[1] = new Video();
         }
 
-        this.items[this.currentItem].Seek(seekTime);
+        this.items[0].Seek(seekTime);
     },
 
     IsPlaying: function()
     {
     	if(this.items.length > 0)
     	{
-    		 return  this.items[this.currentItem].IsPlaying();
+    		 return  this.items[0].IsPlaying();
     	}
 
     	return false;
