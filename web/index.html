@@ -61,16 +61,21 @@
                 				PlayNext();
                 			}
                 		}
-                		else if(oscMessage.args[0] >= 0 && oscMessage.args[0] < PlayList.length)
+                		else if(oscMessage.args[0] >= 1)
                 		{
-                			VideoPlayer.Play(MEDIAS_FOLDER + PlayList[oscMessage.args[0]], true);
-
-                			if(AUTOPLAY == true)
+                			var fileIndex = oscMessage.args[0] - 1;
+                			
+                			 if(fileIndex < PlayList.length)
                 			{
-                				AUTOPLAY = false;
-                				clearInterval(UpdateLoopObj);
-                				UpdateLoopObj = undefined;
-                			}
+                				VideoPlayer.Play(MEDIAS_FOLDER + PlayList[oscMessage.args[0]], true);
+
+	                			if(AUTOPLAY == true)
+	                			{
+	                				AUTOPLAY = false;
+	                				clearInterval(UpdateLoopObj);
+	                				UpdateLoopObj = undefined;
+	                			}
+	                		}
                 		}
 
                 		SendAcknowledge(oscMessage.args[0]);
