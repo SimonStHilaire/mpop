@@ -31,6 +31,7 @@
         <script src="playlist.js"></script>
         <script type="text/javascript">
             var CurrentMedia = -1;
+            var UpdateLoopObj = undefined;
 
             var port = new osc.WebSocketPort({
                 url: "ws://localhost:8081"
@@ -41,10 +42,39 @@
                 //$("#message").text(JSON.stringify(oscMessage, undefined, 2));
                 //console.log("message", oscMessage);
 
-                if(oscMessage.address == "/play")
+                if(oscMessage.address == OSC_MESSAGE)
                 {
-                    VideoPlayer.Play("../../Medias/" + oscMessage.args[0], true);
-                    SendAcknowledge(oscMessage.args[0]);
+                	if(oscMessage.args != undefined && 
+                		oscMessage.args.length > 0)
+                	{
+                		if(oscMessage.args[0] == 0)
+                		{
+                			VideoPlayer.Stop();
+                		}
+                		else if(oscMessage.args[0] == "loop")
+                		{
+                			if(AUTOPLAY == false)
+                			{
+                				AUTOPLAY = true;
+                				VideoPlayer.Stop();
+                				UpdateLoopObj = setInterval(UpdateLoop, 1100);//Mut be greater than fadetime
+                				PlayNext();
+                			}
+                		}
+                		else if(oscMessage.args[0] >= 0 && oscMessage.args[0] < PlayList.length)
+                		{
+                			VideoPlayer.Play(MEDIAS_FOLDER + PlayList[oscMessage.args[0]], true);
+
+                			if(AUTOPLAY == true)
+                			{
+                				AUTOPLAY = false;
+                				clearInterval(UpdateLoopObj);
+                				UpdateLoopObj = undefined;
+                			}
+                		}
+
+                		SendAcknowledge(oscMessage.args[0]);
+                	}                
                 }
                 else if (oscMessage.address == "/stop")
                 {
@@ -57,7 +87,7 @@
             var SendAcknowledge = function (fileId)
             {
                 port.send({
-                    address: "/acknowledge",
+                    address: OSC_MESSAGE + "/",
                     args: [ID, fileId]
                 });
             }
@@ -69,7 +99,7 @@
                 if(CurrentMedia >= PlayList.length)
                     CurrentMedia = 0;
 
-                VideoPlayer.Play("../../Medias/" + PlayList[CurrentMedia]);
+                VideoPlayer.Play(MEDIAS_FOLDER + PlayList[CurrentMedia]);
             };
 
             var UpdateLoop = function ()
@@ -82,10 +112,9 @@
 
             if(AUTOPLAY != false)
             {
-                setInterval(UpdateLoop, 1100);//Mut be greater than fadetime
+                UpdateLoopObj = setInterval(UpdateLoop, 1100);//Mut be greater than fadetime
             }
-            
-
+    
         </script>
     </head>
 

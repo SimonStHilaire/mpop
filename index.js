@@ -17,10 +17,12 @@ var getIPAddresses = function () {
     for (var deviceName in interfaces){
         var addresses = interfaces[deviceName];
 
-        for (var i = 0; i < addresses.length; i++) {
+        for (var i = 0; i < addresses.length; i++)
+        {
             var addressInfo = addresses[i];
 
-            if (addressInfo.family === "IPv4" && !addressInfo.internal) {
+            if (addressInfo.family === "IPv4" && !addressInfo.internal)
+            {
                 ipAddresses.push(addressInfo.address);
             }
         }
@@ -55,41 +57,51 @@ fs.readdir(directoryPath, function (err, files)
 	});
 });
 
-var udp = new osc.UDPPort({
+var udp = new osc.UDPPort(
+{
     localAddress: "0.0.0.0",
     localPort: 7400,
     remoteAddress: "127.0.0.1",
     remotePort: 7500
 });
 
-udp.on("ready", function () {
+udp.on("ready", function ()
+{
     var ipAddresses = getIPAddresses();
+
     console.log("Listening for OSC over UDP.");
-    ipAddresses.forEach(function (address) {
+
+    ipAddresses.forEach(function (address)
+    {
         console.log(" Host:", address + ", Port:", udp.options.localPort);
     });
+
     console.log("Broadcasting OSC over UDP to", udp.options.remoteAddress + ", Port:", udp.options.remotePort);
 });
 
-udp.on("message", function (oscMsg, timeTag, info) {
+udp.on("message", function (oscMsg, timeTag, info)
+{
     udp.options.remoteAddress = info.address;
-    //console.log("An OSC message just arrived!", oscMsg);
-    //console.log("Remote info is: ", info);
 });
 
 udp.open();
 
-var wss = new WebSocket.Server({
+var wss = new WebSocket.Server(
+{
     port: 8081
 });
 
-wss.on("connection", function (socket) {
-    console.log("A Web Socket connection has been established!");
-    var socketPort = new osc.WebSocketPort({
+wss.on("connection", function (socket)
+{
+    console.log("Connected");
+
+    var socketPort = new osc.WebSocketPort(
+    {
         socket: socket
     });
 
-    var relay = new osc.Relay(udp, socketPort, {
+    var relay = new osc.Relay(udp, socketPort, 
+    {
         raw: true
     });
 });
